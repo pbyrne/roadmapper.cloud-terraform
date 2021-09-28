@@ -1,16 +1,25 @@
-resource "netlify_site" "roadmapper-cloud" {
-  custom_domain = "roadmapper.cloud"
-  name          = "roadmapper-cloud"
-
-  repo {
-    repo_branch   = "master"
-    command       = var.command
-    deploy_key_id = var.deploy_key.id
-    dir           = var.output
-    provider      = "github"
-    repo_path     = var.repo
+terraform {
+  required_providers {
+    dnsimple = {
+      source = "dnsimple/dnsimple"
+    }
   }
 }
 
+locals {
+  netlify_hostname = "roadmapper-cloud.netlify.app"
+}
 
+resource "dnsimple_record" "root" {
+  domain = "roadmapper.cloud"
+  name   = ""
+  type   = "ALIAS"
+  value  = locals.netlify_hostname
+}
 
+resource "dnsimple_record" "www" {
+  domain = "roadmapper.cloud"
+  name   = "www"
+  type   = "CNAME"
+  value  = locals.netlify_hostname
+}
